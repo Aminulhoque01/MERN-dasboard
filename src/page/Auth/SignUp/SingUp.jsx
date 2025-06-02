@@ -1,28 +1,27 @@
 import { message } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { useLoginMutation } from "../../../redux/features/auth/authApi";
-import { loggedUser } from "../../../redux/features/auth/authSlice"; // make sure import this
+import { useNavigate } from "react-router-dom";
+import { useRegisterMutation } from "../../../redux/features/auth/authApi";
+import { loggedUser } from "../../../redux/features/auth/authSlice"; // Import this correctly
 
-const Login = () => {
+const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  // Array of 4 shop name inputs
+  const [shops, setShops] = useState(["", "", "", ""]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [login, { data, error, isLoading, isSuccess, isError }] =
-    useLoginMutation();
+  const [register, { data, error, isLoading, isSuccess, isError }] =
+    useRegisterMutation();
 
-  // Effect to run on successful login
+  // Effect to run on successful signup
   useEffect(() => {
     if (isSuccess && data) {
-      // Save token to localStorage
       localStorage.setItem("user", JSON.stringify(data.data.attributes.token));
 
-      // Dispatch redux state
       dispatch(
         loggedUser({
           token: data.data.attributes.token,
@@ -30,19 +29,34 @@ const Login = () => {
         })
       );
 
-      message.success(data.message || "Login successful");
-
-      // Navigate to home page
+      message.success(data.message || "Signup successful");
       navigate("/");
     }
   }, [isSuccess, data, dispatch, navigate]);
 
-  // Handle form submit triggers login mutation
+  // Handle change for shop names
+  const handleShopChange = (index, value) => {
+    const newShops = [...shops];
+    newShops[index] = value;
+    setShops(newShops);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Trigger login mutation
-    login({ username, password, loginType: "nameAndPassword" });
+    // Validate at least 3 shops filled (non-empty)
+    const filledShops = shops.filter((shop) => shop.trim() !== "");
+    if (filledShops.length < 3) {
+      message.error("Please enter at least 3 shop names.");
+      return;
+    }
+
+    // Trigger register mutation
+    register({
+      username,
+      password,
+      shops: filledShops,
+    });
   };
 
   return (
@@ -55,14 +69,13 @@ const Login = () => {
             </span>
           </div>
         </div>
-        <h2 className="text-2xl font-semibold text-center mb-4">
-          Welcome Back
-        </h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">Sign Up</h2>
         <p className="text-center text-gray-600 mb-6">
           Please Enter Your Details Below to Continue
         </p>
 
         <form onSubmit={handleSubmit}>
+          {/* Username */}
           <div className="mb-4">
             <label
               htmlFor="username"
@@ -83,6 +96,7 @@ const Login = () => {
             />
           </div>
 
+          {/* Password */}
           <div className="mb-4">
             <label
               htmlFor="password"
@@ -103,34 +117,29 @@ const Login = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
+          {/* Shop Names */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Shop Names (Enter at least 3)
+            </label>
+            {shops.map((shop, index) => (
               <input
-                type="checkbox"
-                id="remember-me"
-                name="remember-me"
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                key={index}
+                type="text"
+                className="w-full p-3 mb-2 border border-gray-300 rounded-md"
+                placeholder={`Shop Name ${index + 1}`}
+                value={shop}
+                onChange={(e) => handleShopChange(index, e.target.value)}
                 disabled={isLoading}
+                required={index < 3} // first 3 are required, 4th optional
               />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 text-sm text-gray-600"
-              >
-                Remember me
-              </label>
-            </div>
-            <Link to="/auth/signup">
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-700">
-                SignUp
-              </a>
-            </Link>
+            ))}
           </div>
 
+          {/* Show error message */}
           {isError && (
             <p className="mb-4 text-red-600 text-center">
-              {error?.data?.message || "Login failed"}
+              {error?.data?.message || "Signup failed"}
             </p>
           )}
 
@@ -141,7 +150,7 @@ const Login = () => {
             }`}
             disabled={isLoading}
           >
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
       </div>
@@ -149,4 +158,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
