@@ -2,19 +2,28 @@ import { Modal } from "antd";
 import { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const UserCenterPin = () => {
   const user = useSelector((state) => state.auth.user);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigate = useNavigate();
 
   if (!user) return null;
 
   const showModal = () => setIsModalVisible(true);
   const handleClose = () => setIsModalVisible(false);
 
+  // Navigate to shop detail and close modal
+  const handleShopClick = (shopName) => {
+    setIsModalVisible(false);
+    // Encode shopName for URL safety if needed
+    const encodedShop = encodeURIComponent(shopName);
+    navigate(`/shop/${encodedShop}`);
+  };
+
   return (
     <>
-      {/* Centered fixed user icon & name */}
       <div
         onClick={showModal}
         style={{
@@ -48,11 +57,9 @@ const UserCenterPin = () => {
         <span>{user.username || "User"}</span>
       </div>
 
-      {/* Modal to show shops */}
       <Modal
         title="Your Shops"
         visible={isModalVisible}
-        onOk={handleClose}
         onCancel={handleClose}
         footer={[
           <button key="close" onClick={handleClose}>
@@ -63,7 +70,16 @@ const UserCenterPin = () => {
         <ul>
           {user.shops?.length > 0 ? (
             user.shops.map((shop, i) => (
-              <li key={i} style={{ padding: "8px 0" }}>
+              <li
+                key={i}
+                style={{
+                  padding: "8px 0",
+                  cursor: "pointer",
+                  color: "#1890ff",
+                  textDecoration: "underline",
+                }}
+                onClick={() => handleShopClick(shop)}
+              >
                 {shop}
               </li>
             ))

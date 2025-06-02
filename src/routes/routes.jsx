@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { createBrowserRouter } from "react-router-dom";
-import Settings from "../component/Main/Settings/Settings";
 import MainLayout from "../layout/MainLayout";
 
+import ShopDetail from "../component/Main/ShopDetails/ShopeDetails";
 import SignIn from "../page/Auth/SignIn/SignIn";
 import SignUp from "../page/Auth/SignUp/SingUp";
 import DashboardHome from "../page/DashboardHome/DashboardHome";
@@ -29,8 +29,8 @@ const router = createBrowserRouter([
         element: <UsersPage />,
       },
       {
-        path: "/personal-info",
-        element: <Settings />,
+        path: "/shop",
+        element: <ShopDetail />,
       },
     ],
   },
