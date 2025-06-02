@@ -6,7 +6,7 @@ const ShopDetail = () => {
   return (
     <div className="p-5">
       <h1 className="text-3xl font-bold mb-4">Shop Detail</h1>
-      <p className="text-xl">
+      <p className="text-xl jus">
         Showing details for shop:{" "}
         <strong>{decodeURIComponent(shopName)}</strong>
       </p>

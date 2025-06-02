@@ -29,7 +29,7 @@ const router = createBrowserRouter([
         element: <UsersPage />,
       },
       {
-        path: "/shop",
+        path: "/shop/:shopName", // ✅ dynamic path for shop details
         element: <ShopDetail />,
       },
     ],
