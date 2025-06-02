@@ -9,6 +9,7 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,7 +41,12 @@ const Login = () => {
   // Handle form submit triggers login mutation
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (!/^(?=.*[!@#$%^&*]).{8,}$/.test(password)) {
+      message.error(
+        "Password must be at least 8 characters and contain at least one special character (!@#$%^&*)."
+      );
+      return;
+    }
     // Trigger login mutation
     login({ username, password, loginType: "nameAndPassword" });
   };
@@ -83,25 +89,19 @@ const Login = () => {
             />
           </div>
 
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="w-full p-3 mt-2 border border-gray-300 rounded-md"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-            />
-          </div>
+          <input
+            type={showPassword ? "text" : "password"}
+            id="password"
+            name="password"
+            className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            required
+            pattern="^(?=.*[!@#$%^&*]).{8,}$"
+            title="Password must be at least 8 characters and contain at least one special character (!@#$%^&*)."
+          />
 
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">

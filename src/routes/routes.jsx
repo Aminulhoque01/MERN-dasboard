@@ -13,11 +13,7 @@ import UsersPage from "../page/Users/UsersPage";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      // <AdminRoutes>
-      // </AdminRoutes>
-      <MainLayout />
-    ),
+    element: <MainLayout />,
     errorElement: <h1>Error</h1>,
     children: [
       {

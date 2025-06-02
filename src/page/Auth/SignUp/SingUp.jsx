@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useRegisterMutation } from "../../../redux/features/auth/authApi";
-import { loggedUser } from "../../../redux/features/auth/authSlice"; // Import this correctly
+import { loggedUser } from "../../../redux/features/auth/authSlice";
 
 const SignUp = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // Array of 4 shop name inputs
-  const [shops, setShops] = useState(["", "", "", ""]);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Start with 3 empty shop fields initially
+  const [shops, setShops] = useState(["", "", ""]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,7 +20,6 @@ const SignUp = () => {
   const [register, { data, error, isLoading, isSuccess, isError }] =
     useRegisterMutation();
 
-  // Effect to run on successful signup
   useEffect(() => {
     if (isSuccess && data) {
       localStorage.setItem("user", JSON.stringify(data.data.attributes.token));
@@ -30,28 +32,44 @@ const SignUp = () => {
       );
 
       message.success(data.message || "Signup successful");
-      navigate("/");
+      navigate("/auth");
     }
   }, [isSuccess, data, dispatch, navigate]);
 
-  // Handle change for shop names
   const handleShopChange = (index, value) => {
     const newShops = [...shops];
     newShops[index] = value;
     setShops(newShops);
   };
 
+  const addShopField = () => {
+    setShops([...shops, ""]);
+  };
+
+  const removeShopField = (index) => {
+    if (shops.length <= 3) {
+      message.warning("You must have at least 3 shop names.");
+      return;
+    }
+    const newShops = shops.filter((_, i) => i !== index);
+    setShops(newShops);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate at least 3 shops filled (non-empty)
     const filledShops = shops.filter((shop) => shop.trim() !== "");
     if (filledShops.length < 3) {
       message.error("Please enter at least 3 shop names.");
       return;
     }
+    if (!/^(?=.*[!@#$%^&*]).{8,}$/.test(password)) {
+      message.error(
+        "Password must be at least 8 characters and contain at least one special character (!@#$%^&*)."
+      );
+      return;
+    }
 
-    // Trigger register mutation
     register({
       username,
       password,
@@ -62,6 +80,7 @@ const SignUp = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+        {/* Icon and Heading */}
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
             <span role="img" aria-label="thumbs-up" className="text-3xl">
@@ -97,43 +116,61 @@ const SignUp = () => {
           </div>
 
           {/* Password */}
-          <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="w-full p-3 mt-2 border border-gray-300 rounded-md"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-            />
-          </div>
+          <input
+            type={showPassword ? "text" : "password"}
+            id="password"
+            name="password"
+            className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            required
+            pattern="^(?=.*[!@#$%^&*]).{8,}$"
+            title="Password must be at least 8 characters and contain at least one special character (!@#$%^&*)."
+          />
 
           {/* Shop Names */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Shop Names (Enter at least 3)
             </label>
+
             {shops.map((shop, index) => (
-              <input
-                key={index}
-                type="text"
-                className="w-full p-3 mb-2 border border-gray-300 rounded-md"
-                placeholder={`Shop Name ${index + 1}`}
-                value={shop}
-                onChange={(e) => handleShopChange(index, e.target.value)}
-                disabled={isLoading}
-                required={index < 3} // first 3 are required, 4th optional
-              />
+              <div key={index} className="flex items-center mb-2">
+                <input
+                  type="text"
+                  className="flex-grow p-3 border border-gray-300 rounded-md"
+                  placeholder={`Shop Name ${index + 1}`}
+                  value={shop}
+                  onChange={(e) => handleShopChange(index, e.target.value)}
+                  disabled={isLoading}
+                  required={index < 3} // Require first 3 inputs
+                />
+                {/* Show remove button for fields beyond 3 */}
+                {shops.length > 3 && (
+                  <button
+                    type="button"
+                    className="ml-2 px-3 py-1 text-red-600 font-semibold hover:text-red-800"
+                    onClick={() => removeShopField(index)}
+                    disabled={isLoading}
+                    aria-label={`Remove shop name ${index + 1}`}
+                  >
+                    &times;
+                  </button>
+                )}
+              </div>
             ))}
+
+            {/* Add new shop button */}
+            <button
+              type="button"
+              className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              onClick={addShopField}
+              disabled={isLoading}
+            >
+              + Add Shop
+            </button>
           </div>
 
           {/* Show error message */}
