@@ -1,5 +1,6 @@
 import { message } from "antd";
 import { useEffect, useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // react-icons eye icons
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "../../../redux/features/auth/authApi";
@@ -89,20 +90,34 @@ const Login = () => {
             />
           </div>
 
-          <input
-            type={showPassword ? "text" : "password"}
-            id="password"
-            name="password"
-            className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-            required
-            pattern="^(?=.*[!@#$%^&*]).{8,}$"
-            title="Password must be at least 8 characters and contain at least one special character (!@#$%^&*)."
-          />
-
+          <div className="relative mb-4">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+              required
+              pattern="^(?=.*[!@#$%^&*]).{8,}$"
+              title="Password must be at least 8 characters and contain at least one special character (!@#$%^&*)."
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900"
+              tabIndex={-1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <AiOutlineEyeInvisible size={20} />
+              ) : (
+                <AiOutlineEye size={20} />
+              )}
+            </button>
+          </div>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <input
@@ -127,13 +142,11 @@ const Login = () => {
               </a>
             </Link>
           </div>
-
           {isError && (
             <p className="mb-4 text-red-600 text-center">
               {error?.data?.message || "Login failed"}
             </p>
           )}
-
           <button
             type="submit"
             className={`w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 ${
