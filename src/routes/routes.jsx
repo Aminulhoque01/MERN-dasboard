@@ -6,9 +6,7 @@ import ShopDetail from "../component/Main/ShopDetails/ShopeDetails";
 import SignIn from "../page/Auth/SignIn/SignIn";
 import SignUp from "../page/Auth/SignUp/SingUp";
 import DashboardHome from "../page/DashboardHome/DashboardHome";
-import UsersPage from "../page/Users/UsersPage";
-// import AddItemPage from "../page/AddItem/AddItemPage";
-// import AdminRoutes from "./AdminRoutes";
+ 
 
 const router = createBrowserRouter([
   {
@@ -20,10 +18,7 @@ const router = createBrowserRouter([
         index: true,
         element: <DashboardHome />,
       },
-      {
-        path: "users",
-        element: <UsersPage />,
-      },
+
       {
         path: "/shop/:shopName", // ✅ dynamic path for shop details
         element: <ShopDetail />,
